@@ -10,20 +10,27 @@ const TABLE = process.env.AUCTIONS_TABLE_NAME;
 
 async function deleteAuction(event, context) {
   const { id } = event.pathParameters;
+  let auction = null;
 
   try {
-    await dynamodb.delete({ TableName: TABLE, Key: { id } }).promise();
+    const response = await dynamodb
+      .delete({ TableName: TABLE, Key: { id }, ReturnValues: 'ALL_OLD' })
+      .promise();
+    auction = response.Attributes;
   } catch (error) {
     console.log(error);
-    throw new createError.InternalServerError(error);
+    throw new createError.InternalServerError({ error });
+  }
+
+  if (!auction.title) {
+    throw new createError.NotFound({ error: 'Auction not found' });
   }
 
   return {
     statusCode: 200,
     body: JSON.stringify({
       data: {
-        deletedId: id,
-        message: 'Auction successfully deleted',
+        message: `Auction: "${auction.title}" was successfully deleted`,
       },
     }),
   };
