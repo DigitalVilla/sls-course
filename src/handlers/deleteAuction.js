@@ -1,12 +1,7 @@
 import AWS from 'aws-sdk';
-import middy from '@middy/core';
-import httpJsonBodyParser from '@middy/http-json-body-parser';
-import httpEventNormalizer from '@middy/http-event-normalizer';
-import httpErrorHandler from '@middy/http-error-handler';
 import createError from 'http-errors';
-
+import commonWare from './lib/commonWare';
 const dynamodb = new AWS.DynamoDB.DocumentClient();
-const TABLE = process.env.AUCTIONS_TABLE_NAME;
 
 async function deleteAuction(event, context) {
   const { id } = event.pathParameters;
@@ -14,7 +9,11 @@ async function deleteAuction(event, context) {
 
   try {
     const response = await dynamodb
-      .delete({ TableName: TABLE, Key: { id }, ReturnValues: 'ALL_OLD' })
+      .delete({
+        TableName: process.env.AUCTIONS_TABLE_NAME,
+        Key: { id },
+        ReturnValues: 'ALL_OLD',
+      })
       .promise();
     auction = response.Attributes;
   } catch (error) {
@@ -36,7 +35,4 @@ async function deleteAuction(event, context) {
   };
 }
 
-export const handler = middy(deleteAuction)
-  .use(httpJsonBodyParser())
-  .use(httpEventNormalizer())
-  .use(httpErrorHandler());
+export const handler = commonWare(deleteAuction);
