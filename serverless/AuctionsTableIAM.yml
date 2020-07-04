@@ -1,0 +1,27 @@
+AuctionsTableGetAll:
+  Effect: Allow
+  Resource:
+    - ${self:custom.AuctionsTable.arn}
+  Action:
+    - dynamodb:Scan
+
+AuctionsTableGet:
+  Effect: Allow
+  Resource:
+    - ${self:custom.AuctionsTable.arn}
+  Action:
+    - dynamodb:GetItem
+
+AuctionsTablePut:
+  Effect: Allow
+  Resource:
+    - ${self:custom.AuctionsTable.arn}
+  Action:
+    - dynamodb:PutItem
+
+AuctionsTableDelete:
+  Effect: Allow
+  Resource:
+    - ${self:custom.AuctionsTable.arn}
+  Action:
+    - dynamodb:DeleteItem

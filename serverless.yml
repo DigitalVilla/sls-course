@@ -1,0 +1,62 @@
+service:
+  name: sls-auction
+
+plugins:
+  - serverless-bundle
+  - serverless-pseudo-parameters
+  - serverless-iam-roles-per-function
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  memorySize: 256
+  stage: ${opt:stage, 'dev'}
+  region: us-east-1
+  environment:
+    AUCTIONS_TABLE_NAME: ${self:custom.AuctionsTable.name}
+
+resources:
+  Resources:
+    AuctionsTable: ${file(serverless/AuctionsTableRES.yml):AuctionsTable}
+
+functions:
+  getAuctions:
+    handler: src/handlers/getAuctions.handler
+    iamRoleStatements:
+      - ${file(serverless/AuctionsTableIAM.yml):AuctionsTableGetAll}
+    events:
+      - http:
+          method: GET
+          path: /auctions
+
+  getAuction:
+    handler: src/handlers/getAuction.handler
+    iamRoleStatements:
+      - ${file(serverless/AuctionsTableIAM.yml):AuctionsTableGet}
+    events:
+      - http:
+          method: GET
+          path: /auction/{id}
+
+  createAuction:
+    handler: src/handlers/createAuction.handler
+    events:
+      - http:
+          method: POST
+          path: /auction
+    iamRoleStatements:
+      - ${file(serverless/AuctionsTableIAM.yml):AuctionsTablePut}
+
+  deleteAuction:
+    handler: src/handlers/deleteAuction.handler
+    iamRoleStatements:
+      - ${file(serverless/AuctionsTableIAM.yml):AuctionsTableDelete}
+    events:
+      - http:
+          method: DELETE
+          path: /auction/{id}
+
+custom:
+  AuctionsTable:
+    name: !Ref AuctionsTable
+    arn: !GetAtt AuctionsTable.Arn
