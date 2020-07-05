@@ -22,7 +22,7 @@ async function deleteAuction(event, context) {
   }
 
   if (!auction.title) {
-    throw new createError.NotFound({ error: 'Auction not found' });
+    throw new createError.NotFound('Auction not found');
   }
 
   return {

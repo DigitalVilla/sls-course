@@ -3,9 +3,8 @@ import createError from 'http-errors';
 import commonWare from './lib/commonWare';
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
-async function getAuction(event, context) {
-  const { id } = event.pathParameters;
-  let auction = null;
+export async function getAuctionById(id) {
+  let auction;
 
   try {
     const result = await dynamodb
@@ -18,8 +17,15 @@ async function getAuction(event, context) {
   }
 
   if (!auction) {
-    throw new createError.NotFound({ error: 'Auction not found' });
+    throw new createError.NotFound('Auction not found');
   }
+
+  return auction;
+}
+
+async function getAuction(event, context) {
+  const { id } = event.pathParameters;
+  const auction = await getAuctionById(id);
 
   return {
     statusCode: 200,

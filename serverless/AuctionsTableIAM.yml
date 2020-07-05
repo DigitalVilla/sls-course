@@ -25,3 +25,11 @@ AuctionsTableDelete:
     - ${self:custom.AuctionsTable.arn}
   Action:
     - dynamodb:DeleteItem
+
+PlaceBid:
+  Effect: Allow
+  Resource:
+    - ${self:custom.AuctionsTable.arn}
+  Action:
+    - dynamodb:UpdateItem
+    - dynamodb:GetItem
