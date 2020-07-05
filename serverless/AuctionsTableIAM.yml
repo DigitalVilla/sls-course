@@ -33,3 +33,11 @@ PlaceBid:
   Action:
     - dynamodb:UpdateItem
     - dynamodb:GetItem
+
+CloseAuction:
+  Effect: Allow
+  Resource:
+    - ${self:custom.AuctionsTable.arn}
+  Action:
+    - dynamodb:UpdateItem
+    - dynamodb:GetItem

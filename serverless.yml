@@ -65,6 +65,13 @@ functions:
           method: PATCH
           path: /auction/{id}/bid
 
+  closeAuction:
+    handler: src/handlers/closeAuction.handler
+    iamRoleStatements:
+      - ${file(serverless/AuctionsTableIAM.yml):CloseAuction}
+    # events:
+    #   - schedule: rate(1 minute)
+
 custom:
   AuctionsTable:
     name: !Ref AuctionsTable

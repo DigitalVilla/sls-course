@@ -7,25 +7,24 @@ const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 async function placeBid(event, context) {
   const { id } = event.pathParameters;
-  const { amount, currency } = event.body;
+  const { amount, bidder } = event.body;
   let auction = await getAuctionById(id);
+  const nextBid = auction.highestBid.amount + auction.raise;
 
-  if (amount <= auction.highestBid.amount) {
-    throw new createError.Forbidden(
-      `Your bid must be higher than ${auction.highestBid.amount}!`
-    );
+  if (amount <= nextBid) {
+    throw new createError.Forbidden(`Your bid must be higher than $${nextBid}`);
   }
 
   const params = {
     TableName: process.env.AUCTIONS_TABLE_NAME,
     Key: { id },
     ReturnValues: 'ALL_NEW',
-    UpdateExpression: `set highestBid.amount = :amount ${
-      currency ? ', highestBid.currency = :currency' : ''
-    }`,
+    UpdateExpression:
+      'set highestBid.amount = :amount, highestBid.bidder = :bidder, bids = :bids',
     ExpressionAttributeValues: {
+      ':bids': auction.bids + 1,
       ':amount': amount,
-      ':currency': currency,
+      ':bidder': bidder,
     },
   };
 

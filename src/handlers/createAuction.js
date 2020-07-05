@@ -5,16 +5,24 @@ import commonWare from './lib/commonWare';
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 async function createAuction(event, context) {
-  const { title } = event.body;
+  const { title, initialBid } = event.body;
+  let now = new Date();
+  let endDate = new Date();
+  endDate.setHours(now.getHours() + 1);
+
   const auction = {
     id: uuid(),
     title,
+    bids: 0,
+    initialBid,
+    raise: parseInt(initialBid * 0.02),
     highestBid: {
-      amount: 0,
-      currency: 'USD',
+      amount: initialBid,
+      bidder: '',
     },
     status: 'OPEN',
-    createAt: new Date().toISOString(),
+    createdAt: now.toISOString(),
+    closedAt: endDate.toISOString(),
   };
 
   try {
