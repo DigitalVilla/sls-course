@@ -38,6 +38,8 @@ CloseAuction:
   Effect: Allow
   Resource:
     - ${self:custom.AuctionsTable.arn}
+    - !Join ['/', ['${self:custom.AuctionsTable.arn}', 'index', 'statusClosedDate']]
   Action:
     - dynamodb:UpdateItem
     - dynamodb:GetItem
+    - dynamodb:Query
