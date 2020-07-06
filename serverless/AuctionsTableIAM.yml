@@ -1,9 +1,9 @@
 AuctionsTableGetAll:
   Effect: Allow
   Resource:
-    - ${self:custom.AuctionsTable.arn}
+    - !Join ['/', ['${self:custom.AuctionsTable.arn}', 'index', 'statusClosedDate']]
   Action:
-    - dynamodb:Scan
+    - dynamodb:Query
 
 AuctionsTableGet:
   Effect: Allow
